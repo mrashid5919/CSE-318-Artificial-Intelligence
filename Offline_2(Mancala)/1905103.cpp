@@ -1,8 +1,9 @@
 #include<bits/stdc++.h>
+#include<fstream>
 using namespace std;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-int W1=10,W2=15,W3=20,W4=25;
+int W1=10,W2=15,W3=30,W4=50;
 
 class Mancala{
     public:
@@ -116,20 +117,20 @@ class Mancala{
     int heuristic1(int turn)
     {
         //return bins[13]-bins[6];
-        if(turn==0)
+        //if(turn==0)
             return bins[6]-bins[13];
-        else
-            return bins[13]-bins[6];
+        //else
+            //return bins[13]-bins[6];
     }
 
     // W1 * (stones_in_my_storage – stones_in_opponents_storage) +
     // W2 * (stones_on_my_side – stones_on_opponents_side)
     int heuristic2(int turn)
     {
-        if(turn==0)
+        //if(turn==0)
             return W1*heuristic1(turn)+W2*(getStones(0)-getStones(1));
-        else
-            return W1*heuristic1(turn)+W2*(getStones(1)-getStones(0));
+        //else
+            //return W1*heuristic1(turn)+W2*(getStones(1)-getStones(0));
     }
 
     // W1*(stones_in_my_storage – stones_in_opponents_storage) +
@@ -206,7 +207,7 @@ class Mancala{
                 if(eva>=maxEva)
                 {
                     maxEva=eva;
-                    idx=i;
+                    idx=tmp[i];
                 }
                 for(int j=0;j<14;j++)
                     bins[j]=b[j];
@@ -243,7 +244,7 @@ class Mancala{
                 if(eva<=minEva)
                 {
                     minEva=eva;
-                    idx=i;
+                    idx=tmp[i];
                 }
                 for(int j=0;j<14;j++)
                     bins[j]=b[j];
@@ -281,6 +282,8 @@ class Mancala{
     {
         cout<<"Player 1: "<<bins[6]<<"\n";
         cout<<"Player 2: "<<bins[13]<<"\n";
+        //outputFile<<"Player 1: "<<bins[6]<<"\n";
+        //outputFile<<"Player 2: "<<bins[13]<<"\n";
         if(bins[6]>bins[13])
         {
             cout<<"Player 1 is winner\n";
@@ -350,7 +353,7 @@ int game(bool csv,int choice,int heuristic1,int heuristic2,int depth1,int depth2
             int idx=mancala->minimaxAlgo(depth2,mancala->turn,-100000,100000,0,0,heuristic2).second;
             if(!csv)
                 cout<<"Bin: "<<13-idx<<"\n";
-            mancala->choose(13-idx);
+            mancala->choose(idx);
             if(!csv)
                 mancala->print();
             mancala->isOver=mancala->isrowEmpty();
@@ -376,11 +379,11 @@ int main()
     cout<<"1. AI vs AI\n";
     cout<<"2. Human vs AI\n";
     cin>>choice;
-    while(choice<=0 || choice>=3)
+    /*while(choice<=0 || choice>=3)
     {
         cout<<"Invalid input. Please enter 1/2\n";
         cin>>choice;
-    }
+    }*/
     if(choice==1)
         cout<<"AI vs AI\n";
     else if(choice==2)
@@ -389,8 +392,9 @@ int main()
     int csv=0;
     if(csv)
     {
-        cout<<"Depth,P1_Heuristic,P2_Heuristic,P1_Win,P2_Win, Draw\n";
-        for(int m=1;m<5;m++)
+        ofstream outputFile("result.csv");
+        outputFile<<"Depth,P1_Heuristic,P2_Heuristic,P1_Win,P2_Win, Draw\n";
+        for(int m=4;m<9;m++)
         {
             for(int i=1;i<5;i++)
             {
@@ -407,19 +411,45 @@ int main()
                         else
                             cnt2++;
                     }
-                    cout<<m<<","<<i<<","<<j<<","<<cnt1<<","<<cnt2<<","<<draw<<"\n";
+                    outputFile<<m<<","<<i<<","<<j<<","<<cnt1<<","<<cnt2<<","<<draw<<"\n";
                 }
             }
-            cout<<"\n";
+            //cout<<"\n";
         }
+        outputFile.close();
     }
     else
     {
-        int heuristic1=1;
-        int heuristic2=3;
-        int depth1=5;
-        int depth2=6;
-        game(csv,choice,heuristic1,heuristic2,depth1,depth2);
+        if(choice==1)
+        {
+            /*for(int i=1;i<5;i++)
+            {
+                for(int j=1;j<5;j++)
+                {
+                    outputFile<<i<<" vs "<<j<<"\n";
+                    game(csv,choice,i,j,10,10);
+                    outputFile<<"\n";
+                }
+            }*/
+            int heuristic1,heuristic2,depth1,depth2;
+            cout<<"Enter heuristic number of AI_1: ";
+            cin>>heuristic1;
+            cout<<"Enter heuristic number of AI_2: ";
+            cin>>heuristic2;
+            cout<<"Enter depth of AI_1: ";
+            cin>>depth1;
+            cout<<"Enter depth of AI_2: ";
+            cin>>depth2;
+            game(csv,choice,heuristic1,heuristic2,depth1,depth2);
+        }
+        else
+        {
+            int heuristic1=1;
+            int heuristic2=4;
+            int depth1=5;
+            int depth2=10;
+            game(csv,choice,heuristic1,heuristic2,depth1,depth2);
+        }
     }
     return 0;
 }
