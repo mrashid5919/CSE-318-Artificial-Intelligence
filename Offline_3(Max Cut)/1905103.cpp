@@ -7,6 +7,30 @@ long long n,m,pos[100005],mx,mxa,mxb;
 vector<pair<long long,pair<long long,long long> > > edges;
 vector<pair<long long,long long> > adj[100005];
 
+long long randomMaxCut()
+{
+    long long totSum=0;
+    for(int x=0;x<10;x++)
+    {
+        for(long long i=0;i<n;i++)
+            pos[i]=0;
+        for(long long i=0;i<n;i++)
+        {
+            pos[i]=rand()%2+1;
+            //cout<<pos[i]<<"\n";
+        }
+        for(long long i=0;i<m;i++)
+        {
+            if(pos[edges[i].first]!=pos[edges[i].second.first])
+            {
+                totSum+=edges[i].second.second;
+                //cout<<i<<" "<<totSum<<"\n";
+            }
+        }
+    }
+    return totSum/10;
+}
+
 long long greedyMaxCut()
 {
     for(long long i=0;i<n;i++)
@@ -100,6 +124,7 @@ long long greedyMaxCut()
 int main()
 {
     fastio;
+    srand(time(0));
     long long i,j,a,b,w;
     cin>>n>>m;
     for(i=0;i<m;i++)
@@ -121,7 +146,8 @@ int main()
             mxb=b-1;
         }
     }
-    cout<<greedyMaxCut()<<"\n";
+    cout<<"Randomized: "<<randomMaxCut()<<"\n";
+    cout<<"Greedy: "<<greedyMaxCut()<<"\n";
     //for(i=0;i<n;i++)
         //cout<<pos[i]<<" ";
 }
