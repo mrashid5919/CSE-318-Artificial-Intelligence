@@ -28,6 +28,7 @@ long long randomMaxCut()
             }
         }
     }
+    //doing 10 iterations and taking the average
     return totSum/10;
 }
 
@@ -44,62 +45,33 @@ long long greedyMaxCut()
     while(setA.size()+setB.size()!=n)
     {
         mxSigma=LLONG_MIN;
-        for(long long i=0;i<setA.size();i++)
-        {  
-            for(long long j=0;j<adj[setA[i]].size();j++)
+        //Checking adding which node will maximize the sum of edge weights
+        for(long long i=0;i<n;i++)
+        {
+            if(pos[i]==0)
             {
-                long long cur=adj[setA[i]][j].first;
-                if(pos[cur]==0)
+                long long curX=0,curY=0;
+                for(long long k=0;k<adj[i].size();k++)
                 {
-                    long long curX=0,curY=0;
-                    for(long long k=0;k<adj[cur].size();k++)
-                    {
-                        if(pos[adj[cur][k].first]==1)
-                            curX+=adj[cur][k].second;
-                        else if(pos[adj[cur][k].first]==2)
-                            curY+=adj[cur][k].second;
-                    }
-                    if(max(curX,curY)>mxSigma)
-                    {
-                        mxSigma=max(curX,curY);
-                        if(curX>=curY)
-                            mxSigmaPos=2;
-                        else
-                            mxSigmaPos=1;
-                        mxV=cur;
-                    }
+                    if(pos[adj[i][k].first]==1)
+                        curX+=adj[i][k].second;
+                    else if(pos[adj[i][k].first]==2)
+                        curY+=adj[i][k].second;
+                }
+                if(max(curX,curY)>mxSigma)
+                {
+                    mxSigma=max(curX,curY);
+                    if(curX>=curY)
+                        mxSigmaPos=2;
+                    else
+                        mxSigmaPos=1;
+                    mxV=i;
                 }
             }
         }
-
-        for(long long i=0;i<setB.size();i++)
-        {  
-            for(long long j=0;j<adj[setB[i]].size();j++)
-            {
-                long long cur=adj[setB[i]][j].first;
-                if(pos[cur]==0)
-                {
-                        long long curX=0,curY=0;
-                    for(long long k=0;k<adj[cur].size();k++)
-                    {
-                        if(pos[adj[cur][k].first]==1)
-                            curX+=adj[cur][k].second;
-                        else if(pos[adj[cur][k].first]==2)
-                            curY+=adj[cur][k].second;
-                    }
-                    if(max(curX,curY)>mxSigma)
-                    {
-                        mxSigma=max(curX,curY);
-                        if(curX>=curY)
-                            mxSigmaPos=2;
-                        else
-                            mxSigmaPos=1;
-                        mxV=cur;
-                    }
-                }                
-            }
-        }
+        
         //cout<<mxV<<" ";
+        //adding that node to desired set
         if(mxSigmaPos==1)
         {
             setA.push_back(mxV);
@@ -112,6 +84,7 @@ long long greedyMaxCut()
         }
     }
 
+    //adding all the edges which connect the two sets
     long long val=0;
     for(long long i=0;i<m;i++)
     {
@@ -133,6 +106,8 @@ int main()
         adj[a-1].push_back({b-1,w});
         adj[b-1].push_back({a-1,w});
         edges.push_back({a-1,{b-1,w}});
+
+        //Identifying the most heavy edge, required for greedy
         if(i==0)
         {
             mx=w;
