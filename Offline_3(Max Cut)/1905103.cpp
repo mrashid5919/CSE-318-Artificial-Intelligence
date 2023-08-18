@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include<stdio.h>
 using namespace std;
 
 #define fastio ios::sync_with_stdio(0);cin.tie(0)
@@ -6,6 +7,7 @@ using namespace std;
 long long n,m,pos[100005],mx,mxa,mxb,mn,mna,mnb;
 vector<pair<long long,pair<long long,long long> > > edges;
 vector<pair<long long,long long> > adj[100005];
+vector<long long> setP,setQ;
 
 long long randomMaxCut()
 {
@@ -166,6 +168,8 @@ long long semiGreedyMaxCut()
         pos[RCLv[idx].first]=RCLv[idx].second;
     }
     long long val=0;
+    setP=setX;
+    setQ=setY;
     for(long long i=0;i<m;i++)
     {
         if(pos[edges[i].first]!=pos[edges[i].second.first])
@@ -174,9 +178,75 @@ long long semiGreedyMaxCut()
     return val;
 }
 
+long long LocalSearch()
+{
+    bool change=true;
+    long long iterations=0;
+    while(change)
+    {
+        iterations++;
+        change=false;
+        
+        for(long long i=0;i<n;i++)
+        {
+            long long sigmaS=0,sigmaSbar=0;
+            for(long long j=0;j<m;j++)
+            {
+                if(edges[j].first==i)
+                {
+                    if(pos[edges[j].second.first]==2)
+                        sigmaS+=edges[j].second.second;
+                    else
+                        sigmaSbar+=edges[j].second.second;
+                }
+                else if(edges[j].second.first==i)
+                {
+                    if(pos[edges[j].first]==2)
+                        sigmaS+=edges[j].second.second;
+                    else
+                        sigmaSbar+=edges[j].second.second;
+                }
+            }
+            if(pos[i]==1 && sigmaSbar-sigmaS>0)
+            {
+                vector<long long>::iterator it;
+                it=find(setP.begin(),setP.end(),i);
+                if(it!=setP.end())
+                    setP.erase(it);
+                setQ.push_back(i);
+                pos[i]=2;
+                change=true;
+                break;
+            }
+            if(pos[i]==2 && sigmaS-sigmaSbar>0)
+            {
+                vector<long long>::iterator it;
+                it=find(setQ.begin(),setQ.end(),i);
+                if(it!=setQ.end())
+                    setQ.erase(it);
+                setP.push_back(i);
+                pos[i]=1;
+                change=true;
+                break;
+            }
+            if(change)
+                break;
+        }
+    }
+    long long val=0;
+    for(long long i=0;i<m;i++)
+    {
+        if(pos[edges[i].first]!=pos[edges[i].second.first])
+            val+=edges[i].second.second;
+    }
+    cout<<"Local Search: "<<val<<"\n";
+    return iterations;
+}
+
 int main()
 {
     fastio;
+    freopen("tst.txt","r",stdin);
     srand(time(0));
     long long i,j,a,b,w;
     cin>>n>>m;
@@ -214,6 +284,16 @@ int main()
     cout<<"Randomized: "<<randomMaxCut()<<"\n";
     cout<<"Greedy: "<<greedyMaxCut()<<"\n";
     cout<<"Semigreedy: "<<semiGreedyMaxCut()<<"\n";
+    cout<<"Iterations in Local Search: "<<LocalSearch()<<"\n";
     //for(i=0;i<n;i++)
         //cout<<pos[i]<<" ";
 }
+
+/*5 7
+1 2 5
+2 3 9
+1 5 6
+2 5 10
+3 5 2
+3 4 15
+5 4 10*/
