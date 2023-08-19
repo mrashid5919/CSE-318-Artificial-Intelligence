@@ -168,8 +168,12 @@ long long semiGreedyMaxCut()
         pos[RCLv[idx].first]=RCLv[idx].second;
     }
     long long val=0;
-    setP=setX;
-    setQ=setY;
+    setP.clear();
+    setQ.clear();
+    for(long long i=0;i<setX.size();i++)
+        setP.push_back(setX[i]);
+    for(long long i=0;i<setY.size();i++)
+        setQ.push_back(setY[i]);
     for(long long i=0;i<m;i++)
     {
         if(pos[edges[i].first]!=pos[edges[i].second.first])
@@ -216,9 +220,10 @@ long long LocalSearch()
                 setQ.push_back(i);
                 pos[i]=2;
                 change=true;
+                //iterations++;
                 break;
             }
-            if(pos[i]==2 && sigmaS-sigmaSbar>0)
+            else if(pos[i]==2 && sigmaS-sigmaSbar>0)
             {
                 vector<long long>::iterator it;
                 it=find(setQ.begin(),setQ.end(),i);
@@ -227,26 +232,70 @@ long long LocalSearch()
                 setP.push_back(i);
                 pos[i]=1;
                 change=true;
+                //iterations++;
                 break;
             }
-            if(change)
-                break;
+            //if(change)
+                //break;
         }
     }
-    long long val=0;
+    /*long long val=0;
     for(long long i=0;i<m;i++)
     {
         if(pos[edges[i].first]!=pos[edges[i].second.first])
             val+=edges[i].second.second;
-    }
-    cout<<"Local Search: "<<val<<"\n";
+    }*/
     return iterations;
+}
+
+long long grasp(long long maxIterations)
+{
+    long long mx,localSearchIterationSum=0,localSearchVal=0;
+    for(long long i=0;i<maxIterations;i++)
+    {
+        long long s=semiGreedyMaxCut();
+        //cout<<s<<"\n";
+        long long iter=LocalSearch();
+        localSearchIterationSum+=iter;
+        long long val=0;
+        for(long long j=0;j<m;j++)
+        {
+            if(pos[edges[j].first]!=pos[edges[j].second.first])
+                val+=edges[j].second.second;
+        }
+        localSearchVal+=val;
+        //cout<<"Set P: "<<setP.size()<<endl;
+        /*for(long long j=0;j<setP.size();j++)
+            cout<<setP[j]<<" ";
+        cout<<endl;*/
+        //cout<<"Set Q: "<<setQ.size()<<endl;
+        /*for(long long j=0;j<setQ.size();j++)
+            cout<<setQ[j]<<" ";
+        cout<<endl;*/
+        //cout<<val<<endl;
+        if(i==0)
+        {
+            mx=val;
+            //ansSetA=setP;
+            //ansSetB=setQ;
+        }
+        else if(val>mx)
+        {
+            mx=val;
+            //ansSetA=setP;
+            //ansSetB=setQ;
+        }
+    }
+    //cout<<"Local search max iteration: "<<localSearchIterationSum<<endl;
+    cout<<"Local Search average value: "<<localSearchVal/maxIterations<<endl;
+    cout<<"Local Search average no. of iterations: "<<localSearchIterationSum/maxIterations<<endl;
+    return mx;
 }
 
 int main()
 {
     fastio;
-    freopen("tst.txt","r",stdin);
+    //freopen("g27.rud","r",stdin);
     srand(time(0));
     long long i,j,a,b,w;
     cin>>n>>m;
@@ -281,12 +330,18 @@ int main()
         }
     }
     //cout<<"here\n";
-    cout<<"Randomized: "<<randomMaxCut()<<"\n";
-    cout<<"Greedy: "<<greedyMaxCut()<<"\n";
-    cout<<"Semigreedy: "<<semiGreedyMaxCut()<<"\n";
-    cout<<"Iterations in Local Search: "<<LocalSearch()<<"\n";
+    cout<<"Randomized: "<<randomMaxCut()<<endl;
+    cout<<"Greedy: "<<greedyMaxCut()<<endl;
+    long long semgreedysum=0;
+    for(int i=0;i<10;i++)
+    {
+        semgreedysum+=semiGreedyMaxCut();
+    }
+    cout<<"Semigreedy: "<<semgreedysum/10<<endl;
+    //cout<<"Iterations in Local Search: "<<LocalSearch()<<"\n";
     //for(i=0;i<n;i++)
         //cout<<pos[i]<<" ";
+    cout<<"Best value from GRASP: "<<grasp(100)<<endl;
 }
 
 /*5 7
