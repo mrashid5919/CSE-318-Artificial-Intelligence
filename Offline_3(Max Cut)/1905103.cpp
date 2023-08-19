@@ -221,7 +221,7 @@ long long LocalSearch()
                 pos[i]=2;
                 change=true;
                 //iterations++;
-                break;
+                //break;
             }
             else if(pos[i]==2 && sigmaS-sigmaSbar>0)
             {
@@ -233,7 +233,7 @@ long long LocalSearch()
                 pos[i]=1;
                 change=true;
                 //iterations++;
-                break;
+                //break;
             }
             //if(change)
                 //break;
